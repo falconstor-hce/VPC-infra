@@ -1,0 +1,142 @@
+{
+    "enable_transit_gateway": true,
+    "transit_gateway_connections": [
+      "management"
+    ],
+    "transit_gateway_resource_group": "slz-service-rg",
+    "service_endpoints": "private",
+    "security_groups": [],
+    "atracker": {
+      "collector_bucket_name": "",
+      "receive_global_events": true,
+      "resource_group": "",
+      "add_route": false
+    },
+    "cos": [
+      {
+        "buckets": [
+          {
+            "endpoint_type": "public",
+            "force_delete": true,
+            "name": "falconstor-bucket",
+            "storage_class": "standard",
+            "kms_key": "slz-cos-key"
+          }
+        ],
+        "keys": [
+          {
+              "name": "falconstor-cos",
+              "role": "Object Writer",
+              "enable_HMAC": true
+          }
+        ],
+        "name": "falconstor-cos",
+        "plan": "standard",
+        "random_suffix": true,
+        "resource_group": "slz-service-rg",
+        "use_data": false
+      }
+    ],
+    "iam_account_settings": {
+      "enable": false
+    },
+    "key_management": {
+      "keys": [
+        {
+          "key_ring": "slz-slz-ring",
+          "name": "slz-cos-key",
+          "root_key": true
+        }
+      ],
+      "name": "slz-kms",
+      "resource_group": "slz-service-rg",
+      "use_hs_crypto": false
+    },
+    "resource_groups": [
+      {
+        "create": true,
+        "name": "slz-service-rg",
+        "use_prefix": true
+      },
+      {
+        "create": true,
+        "name": "slz-management-rg",
+        "use_prefix": true
+      }
+    ],
+    "secrets_manager": {
+      "kms_key_name": null,
+      "name": null,
+      "resource_group": null,
+      "use_secrets_manager": false
+    },
+    "network_cidr": "10.0.0.0/8",
+    "vpcs": [
+      {
+        "address_prefixes": {
+          "zone-1": [],
+          "zone-2": [],
+          "zone-3": []
+        },
+        "default_security_group_rules": [],
+        "flow_logs_bucket_name": null,
+        "network_acls": [
+          {
+            "name": "management-acl",
+            "rules": [
+              {
+                "action": "allow",
+                "destination": "0.0.0.0/0",
+                "direction": "inbound",
+                "name": "allow-all-inbound",
+                "source": "0.0.0.0/0"
+              },
+              {
+                "action": "allow",
+                "destination": "0.0.0.0/0",
+                "direction": "outbound",
+                "name": "allow-all-outbound",
+                "source": "0.0.0.0/0"
+              }
+            ]
+          }
+        ],
+        "prefix": "management",
+        "resource_group": "slz-management-rg",
+        "subnets": {
+          "zone-1": [
+            {
+              "acl_name": "management-acl",
+              "cidr": "10.10.10.0/24",
+              "name": "zone-1",
+              "public_gateway": false
+            }
+          ],
+          "zone-2": null,
+          "zone-3": null
+        },
+        "use_public_gateways": {
+          "zone-1": false,
+          "zone-2": false,
+          "zone-3": false
+        }
+      }
+    ],
+    "vsi": [],
+    "vpn_gateways": [],
+    "virtual_private_endpoints": [
+      {
+          "service_name": "falconstor-cos",
+          "service_type": "cloud-object-storage",
+          "resource_group": "slz-service-rg",
+          "vpcs": [
+              {
+                  "name": "management",
+                  "subnets": [
+                      "zone-1"
+                  ]
+              }
+          ]
+      }
+  ]
+}  
