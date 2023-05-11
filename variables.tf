@@ -71,6 +71,25 @@ variable "ssh_private_key" {
   default     =""
 }
 
+variable "IBMI_ssh_publickey" {
+  type        = string
+  default     = ""
+  description = "IBMI_ssh_publickey"
+}
+
+variable "AIX_ssh_publickey" {
+  type        = string
+  default     = ""
+  description = "AIX_ssh_publickey"
+}
+
+variable "linux_ssh_publickey" {
+  type        = string
+  default     = ""
+  description = "linux_ssh_publickey"
+}
+
+
 
 #####################################################
 # Optional Parameters
@@ -178,6 +197,142 @@ variable "powervs_storage_config" {
   }
 }
 
+variable "IBMI_sshkey_name" {
+  type        = string
+  default     = "FS_IBMI_sshkey"
+  description = "IBMI_sshkey_name"
+}
+
+variable "IBMI_memory" {
+  type        = number
+  default     = "2"
+  description = "IBMI_memory"
+}
+
+variable "IBMI_processors" {
+  type        = number
+  default     = "0.25"
+  description = "IBMI_processors"
+}
+
+variable "IBMI_instance_name" {
+  type        = string
+  default     = "FS_DraaS_IBMI_instance"
+  description = "IBMI_instance_name"
+}
+
+variable "IBMI_proc_type" {
+  type        = string
+  default     = "shared"
+  description = "IBMI_proc_type"
+}
+
+variable "IBMI_sys_type" {
+  type        = string
+  default     = "s922"
+  description = "IBMI_sys_type"
+}
+
+variable "IBMI_storage_type" {
+  type        = string
+  default     = "tier3"
+  description = "Type of storage tier to assign to the VTL instance based on required performance: 'tier1' or 'tier3'"
+}
+
+variable "powervs_image_names" {
+  description = "List of Images to be imported into cloud account from catalog images."
+  type        = list(string)
+  default = [ "RHEL8-SP6","7200-05-05","IBMi-72-09-2924-8" ]
+}
+
+
+variable "AIX_sshkey_name" {
+  type        = string
+  default     = "fs_AIX_sshkey"
+  description = "AIX_sshkey_name"
+}
+
+
+
+variable "AIX_memory" {
+  type        = number
+  default     = "2"
+  description = "AIX_memory"
+}
+
+variable "AIX_processors" {
+  type        = number
+  default     = "0.25"
+  description = "AIX_processors"
+}
+
+variable "AIX_instance_name" {
+  type        = string
+  default     = "fs_DraaS_AIX_instance"
+  description = "AIX_instance_name"
+}
+
+variable "AIX_proc_type" {
+  type        = string
+  default     = "shared"
+  description = "AIX_proc_type"
+}
+
+variable "AIX_sys_type" {
+  type        = string
+  default     = "s922"
+  description = "AIX_sys_type"
+}
+
+variable "AIX_storage_type" {
+  type        = string
+  default     = "tier3"
+  description = "Type of storage tier to assign to the VTL instance based on required performance: 'tier1' or 'tier3'"
+}
+
+variable "linux_sshkey_name" {
+  type        = string
+  default     = "fs_linux_sshkey"
+  description = "linux_sshkey_name"
+}
+
+
+
+variable "linux_memory" {
+  type        = number
+  default     = "2"
+  description = "linux_memory"
+}
+
+variable "linux_processors" {
+  type        = number
+  default     = "0.25"
+  description = "linux_processors"
+}
+
+variable "linux_instance_name" {
+  type        = string
+  default     = "fs_DraaS_linux_instance"
+  description = "linux_instance_name"
+}
+
+variable "linux_proc_type" {
+  type        = string
+  default     = "shared"
+  description = "linux_proc_type"
+}
+
+variable "linux_sys_type" {
+  type        = string
+  default     = "s922"
+  description = "linux_sys_type"
+}
+
+variable "linux_storage_type" {
+  type        = string
+  default     = "tier3"
+  description = "Type of storage tier to assign to the VTL instance based on required performance: 'tier1' or 'tier3'"
+}
 
 
 #############################################################################
@@ -190,3 +345,5 @@ variable "IC_SCHEMATICS_WORKSPACE_ID" {
   type        = string
   description = "leave blank if running locally. This variable will be automatically populated if running from an IBM Cloud Schematics workspace"
 }
+
+
