@@ -89,6 +89,12 @@ variable "linux_ssh_publickey" {
   description = "linux_ssh_publickey"
 }
 
+variable "windows_ssh_publickey" {
+  type        = string
+  default     = ""
+  description = "windows_ssh_publickey"
+}
+
 
 
 #####################################################

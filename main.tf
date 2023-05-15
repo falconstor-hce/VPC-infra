@@ -338,3 +338,59 @@ resource "ibm_pi_instance" "IBMI-instance" {
     }
 }
 
+
+
+#####################################################
+# Create servers (Windows server in VPC-infrastructure
+#####################################################
+
+
+data "ibm_is_image" "example" {
+  name = "ibm-windows-server-2022-full-standard-amd64-7"
+}
+
+resource "ibm_is_vpc" "example" {
+  name = "windows-vpc"
+}
+
+resource "ibm_is_subnet" "example" {
+  name            = "windows-subnet"
+  vpc             = ibm_is_vpc.example.id
+  zone            = var.region
+  ipv4_cidr_block = "10.240.0.0/24"
+}
+
+resource "ibm_is_ssh_key" "example" {
+  name       = "windows-ssh"
+  public_key = var.windows_ssh_publickey
+}
+
+resource "ibm_is_instance" "example" {
+  name    = "windows-instance"
+  image   = data.ibm_is_image.example.id
+  profile = "bx2-2x8"
+  metadata_service_enabled  = false
+
+  primary_network_interface {
+    subnet = ibm_is_subnet.example.id
+    primary_ipv4_address = "10.240.0.6"  // will be deprecated. Use primary_ip.[0].address
+    allow_ip_spoofing = true
+  }
+
+  network_interfaces {
+    name   = "eth1"
+    subnet = ibm_is_subnet.example.id
+    allow_ip_spoofing = false
+  }
+
+  vpc  = ibm_is_vpc.example.id
+  zone = var.region
+  keys = [ibm_is_ssh_key.example.id]
+
+  //User can configure timeouts
+  timeouts {
+    create = "15m"
+    update = "15m"
+    delete = "15m"
+  }
+}
