@@ -1,4 +1,3 @@
-
 module "landing_zone" {
   source           = "git::https://github.com/terraform-ibm-modules/terraform-ibm-landing-zone//patterns/vpc?ref=v3.6.1"
   prefix           = var.prefix
@@ -215,14 +214,14 @@ data "ibm_pi_catalog_images" "catalog_images_ds" {
 }
 
 locals {
-  images_length              = length(var.powervs_image_names)
+  images_length              = length(var.powervs_images)
   split_images_index         = ceil(local.images_length / 3)
-  catalog_images_to_import_3 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in slice(var.powervs_image_names, 0, local.split_images_index) : stock_image if stock_image.name == image_name]])
-  catalog_images_to_import_4 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in slice(var.powervs_image_names, 1, local.split_images_index) : stock_image if stock_image.name == image_name]])
-  catalog_images_to_import_5 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in slice(var.powervs_image_names, local.split_images_index, local.images_length) : stock_image if stock_image.name == image_name]])
-  split_images_3             = slice(var.powervs_image_names, 0, local.split_images_index)
-  split_images_4             = slice(var.powervs_image_names, 1, local.split_images_index)
-  split_images_5             = slice(var.powervs_image_names, local.split_images_index, local.images_length)
+  catalog_images_to_import_3 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in slice(var.powervs_images, 0, local.split_images_index) : stock_image if stock_image.name == image_name]])
+  catalog_images_to_import_4 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in slice(var.powervs_images, 1, local.split_images_index) : stock_image if stock_image.name == image_name]])
+  catalog_images_to_import_5 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in slice(var.powervs_images, local.split_images_index, local.images_length) : stock_image if stock_image.name == image_name]])
+  split_images_3             = slice(var.powervs_images, 0, local.split_images_index)
+  split_images_4             = slice(var.powervs_images, 1, local.split_images_index)
+  split_images_5             = slice(var.powervs_images, local.split_images_index, local.images_length)
 
 }
 
@@ -338,9 +337,7 @@ resource "ibm_pi_instance" "IBMI-instance" {
     }
 }
 
-
-
-#####################################################
+####################################################
 # Create servers (Windows server in VPC-infrastructure
 #####################################################
 
