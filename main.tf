@@ -1,3 +1,41 @@
+locals {
+  ibm_powervs_zone_region_map = {
+    "syd04"    = "syd"
+    "syd05"    = "syd"
+    "eu-de-1"  = "eu-de"
+    "eu-de-2"  = "eu-de"
+    "lon04"    = "lon"
+    "lon06"    = "lon"
+    "tok04"    = "tok"
+    "us-east"  = "us-east"
+    "us-south" = "us-south"
+    "dal12"    = "us-south"
+    "tor01"    = "tor"
+    "osa21"    = "osa"
+    "sao01"    = "sao"
+    "mon01"    = "mon"
+    "wdc06"    = "us-east"
+  }
+
+  ibm_powervs_zone_cloud_region_map = {
+    "syd04"    = "au-syd"
+    "syd05"    = "au-syd"
+    "eu-de-1"  = "eu-de"
+    "eu-de-2"  = "eu-de"
+    "lon04"    = "eu-gb"
+    "lon06"    = "eu-gb"
+    "tok04"    = "jp-tok"
+    "us-east"  = "us-east"
+    "us-south" = "us-south"
+    "dal12"    = "us-south"
+    "tor01"    = "ca-tor"
+    "osa21"    = "jp-osa"
+    "sao01"    = "br-sao"
+    "mon01"    = "ca-tor"
+    "wdc06"    = "us-east"
+  }
+}
+
 module "landing_zone" {
   source           = "git::https://github.com/terraform-ibm-modules/terraform-ibm-landing-zone//patterns/vpc?ref=v3.6.1"
   prefix           = var.prefix
@@ -12,6 +50,7 @@ locals {
   hmac_key_name = module.landing_zone.cos_data[0].name
   transit_gateway_name = module.landing_zone.transit_gateway_name
   powervs_workspace_type = "power-iaas"
+
   stock_image_name = "VTL-FalconStor-10_03-001"
   catalog_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == local.stock_image_name]
   private_image = [for x in data.ibm_pi_images.cloud_instance_images.image_info : x if x.name == local.stock_image_name]
@@ -103,11 +142,11 @@ data "ibm_pi_images" "cloud_instance_images" {
 }*/
 
 resource "ibm_pi_image" "stock_image_copy" {
-  count = length(local.private_image_id)
-  pi_image_name       = local.stock_image_name
-  pi_image_id         = local.catalog_image[count.index].image_id
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   provider  =  ibm.ibm-pvs
+  #count = length(local.private_image_id) == 0 ? 1 : 0
+  pi_image_name       = local.stock_image_name
+  pi_image_id         = local.catalog_image[0].image_id
 }
 
 resource "ibm_pi_instance" "instance" {
@@ -117,7 +156,7 @@ resource "ibm_pi_instance" "instance" {
   pi_processors        = var.processors
   pi_instance_name     = var.powervs_instance_name
   pi_proc_type         = var.processor_type
-  pi_image_id          = length(local.private_image_id) == 0 ? ibm_pi_image.stock_image_copy[0].image_id : local.private_image_id
+  pi_image_id          = length(local.private_image_id) == 0 ? ibm_pi_image.stock_image_copy.image_id : local.private_image_id
   pi_sys_type          = var.sys_type
   pi_storage_type      = var.storage_type
   pi_key_pair_name     = data.ibm_pi_key.key_ds.id
