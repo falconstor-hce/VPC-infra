@@ -47,7 +47,7 @@ variable "zone" {
 variable "resource_tags" {
   type        = list(string)
   description = "Optional list of tags to be added to created resources"
-  default     = [""]
+  default     = ["vtl"]
 }
 
 variable "powervs_zone" {
@@ -318,7 +318,7 @@ variable "powervs_os_image_name2" {
   type        = string
   default     = "7200-05-05"
 }
-variable "powervs_os_image_name2" {
+variable "powervs_os_image_name3" {
   description = "Image Name for PowerVS Instance"
   type        = string
   default     = "IBMi-72-09-2924-8"
