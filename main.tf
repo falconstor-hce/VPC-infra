@@ -276,41 +276,25 @@ locals {
 
 }
 
-resource "ibm_pi_image" "import_images_3" {
+data "ibm_pi_image" "image1" {
+  depends_on = [ module.powervs_infra ]
   provider  =  ibm.ibm-pvs
-  count                = length(local.split_images_3)
+  pi_image_name        = var.powervs_os_image_name1
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
-  pi_image_id          = local.catalog_images_to_import_3[count.index].image_id
-  pi_image_name        = local.catalog_images_to_import_3[count.index].name
-
-  timeouts {
-    create = "9m"
-  }
+}
+data "ibm_pi_image" "image2" {
+  depends_on = [ module.powervs_infra ]
+ provider  =  ibm.ibm-pvs
+  pi_image_name        = var.powervs_os_image_name2
+  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
+}
+data "ibm_pi_image" "image3" {
+  depends_on = [ module.powervs_infra ]
+  provider  =  ibm.ibm-pvs
+  pi_image_name        = var.powervs_os_image_name3
+  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 
-resource "ibm_pi_image" "import_images_4" {
-  provider  =  ibm.ibm-pvs
-  count                = length(local.split_images_4)
-  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
-  pi_image_id          = local.catalog_images_to_import_4[count.index].image_id
-  pi_image_name        = local.catalog_images_to_import_4[count.index].name
-
-  timeouts {
-    create = "9m"
-  }
-}
-
-resource "ibm_pi_image" "import_images_5" {
-  provider  =  ibm.ibm-pvs
-  count                = length(local.split_images_5)
-  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
-  pi_image_id          = local.catalog_images_to_import_5[count.index].image_id
-  pi_image_name        = local.catalog_images_to_import_5[count.index].name
-
-  timeouts {
-    create = "9m"
-  }
-}
 
 
 resource "ibm_pi_key" "linux_sshkey" {
@@ -326,8 +310,7 @@ resource "ibm_pi_instance" "linux-instance" {
     pi_processors         = var.linux_processors
     pi_instance_name      = var.linux_instance_name
     pi_proc_type          = var.linux_proc_type
-    count                 = length(local.split_images_3)
-    pi_image_id           = ibm_pi_image.import_images_3[count.index].image_id
+    pi_image_id           = data.ibm_pi_image.image1.id
     pi_key_pair_name      = ibm_pi_key.linux_sshkey.pi_key_name
     pi_sys_type           = var.linux_sys_type
     pi_cloud_instance_id  = data.ibm_resource_instance.powervs_workspace_ds.guid
@@ -353,7 +336,7 @@ resource "ibm_pi_instance" "AIX-instance" {
     pi_instance_name      = var.AIX_instance_name
     pi_proc_type          = var.AIX_proc_type
     count                 = length(local.split_images_4)
-    pi_image_id           = ibm_pi_image.import_images_4[count.index].image_id
+    pi_image_id           = data.ibm_pi_image.image2.id
     pi_key_pair_name      = ibm_pi_key.AIX_sshkey.pi_key_name
     pi_sys_type           = var.AIX_sys_type
     pi_cloud_instance_id  = data.ibm_resource_instance.powervs_workspace_ds.guid
@@ -380,7 +363,7 @@ resource "ibm_pi_instance" "IBMI-instance" {
     pi_instance_name      = var.IBMI_instance_name
     pi_proc_type          = var.IBMI_proc_type
     count                 = length(local.split_images_5)
-    pi_image_id           = ibm_pi_image.import_images_5[count.index].image_id
+    pi_image_id           = data.ibm_pi_image.image3.id
     pi_key_pair_name      = ibm_pi_key.IBMI_sshkey.pi_key_name
     pi_sys_type           = var.IBMI_sys_type
     pi_cloud_instance_id  = data.ibm_resource_instance.powervs_workspace_ds.guid
