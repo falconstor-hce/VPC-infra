@@ -69,17 +69,20 @@ data "ibm_resource_instance" "powervs_workspace_ds" {
 }
 
 data "ibm_pi_key" "key_ds" {
+  provider  =  ibm.ibm-pvs
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_key_name          = module.powervs_infra.powervs_sshkey_name
 }
 
 data "ibm_pi_network" "network_1" {
+  provider  =  ibm.ibm-pvs
   depends_on                   = [module.powervs_infra]
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_network_name      = var.powervs_management_network.name
 }
 
 data "ibm_pi_network" "network_2" {
+  provider  =  ibm.ibm-pvs
   depends_on                   = [module.powervs_infra]
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_network_name      = var.powervs_backup_network.name
@@ -88,9 +91,11 @@ data "ibm_pi_network" "network_2" {
 data "ibm_pi_catalog_images" "catalog_images" {
   sap                  = true
   vtl                  = true
+  provider  =  ibm.ibm-pvs
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 data "ibm_pi_images" "cloud_instance_images" {
+  provider  =  ibm.ibm-pvs
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 /*data "ibm_pi_placement_groups" "cloud_instance_groups" {
@@ -98,19 +103,21 @@ data "ibm_pi_images" "cloud_instance_images" {
 }*/
 
 resource "ibm_pi_image" "stock_image_copy" {
- #count = length(local.private_image_id)
+  count = length(local.private_image_id)
   pi_image_name       = local.stock_image_name
-  pi_image_id         = local.catalog_image.image_id
+  pi_image_id         = local.catalog_image[count.index].image_id
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
+  provider  =  ibm.ibm-pvs
 }
 
 resource "ibm_pi_instance" "instance" {
+  provider  =  ibm.ibm-pvs
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_memory            = var.memory
   pi_processors        = var.processors
   pi_instance_name     = var.powervs_instance_name
   pi_proc_type         = var.processor_type
-  pi_image_id          = ibm_pi_image.stock_image_copy.pi_image_id
+  pi_image_id          = length(local.private_image_id) == 0 ? ibm_pi_image.stock_image_copy[0].image_id : local.private_image_id
   pi_sys_type          = var.sys_type
   pi_storage_type      = var.storage_type
   pi_key_pair_name     = data.ibm_pi_key.key_ds.id
@@ -159,6 +166,7 @@ locals {
 #####################################################
 
 resource "ibm_pi_volume" "create_volume" {
+  provider  =  ibm.ibm-pvs
   depends_on           = [ibm_pi_instance.instance]
   count                = local.disks_number
   pi_volume_size       = local.disks_size[count.index - (local.disks_number * floor(count.index / local.disks_number))]
@@ -177,6 +185,7 @@ resource "ibm_pi_volume" "create_volume" {
 #####################################################
 
 resource "ibm_pi_volume_attach" "instance_volumes_attach" {
+  provider  =  ibm.ibm-pvs
   depends_on           = [ibm_pi_volume.create_volume, ibm_pi_instance.instance]
   count                = local.disks_number
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
@@ -191,6 +200,7 @@ resource "ibm_pi_volume_attach" "instance_volumes_attach" {
 }
 
 data "ibm_pi_instance_ip" "instance_mgmt_ip_ds" {
+  provider  =  ibm.ibm-pvs
   depends_on           = [ibm_pi_instance.instance]
   pi_network_name      = data.ibm_pi_network.network_1.pi_network_name
   pi_instance_name     = ibm_pi_instance.instance.pi_instance_name
@@ -198,6 +208,7 @@ data "ibm_pi_instance_ip" "instance_mgmt_ip_ds" {
 }
 
 data "ibm_pi_instance" "instance_ips_ds" {
+  provider  =  ibm.ibm-pvs
   depends_on           = [ibm_pi_instance.instance]
   pi_instance_name     = ibm_pi_instance.instance.pi_instance_name
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
@@ -210,6 +221,7 @@ data "ibm_pi_instance" "instance_ips_ds" {
 data "ibm_pi_catalog_images" "catalog_images_ds" {
  sap                  = true
  vtl = true
+  provider  =  ibm.ibm-pvs
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 
@@ -226,6 +238,7 @@ locals {
 }
 
 resource "ibm_pi_image" "import_images_3" {
+  provider  =  ibm.ibm-pvs
   count                = length(local.split_images_3)
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_image_id          = local.catalog_images_to_import_3[count.index].image_id
@@ -237,6 +250,7 @@ resource "ibm_pi_image" "import_images_3" {
 }
 
 resource "ibm_pi_image" "import_images_4" {
+  provider  =  ibm.ibm-pvs
   count                = length(local.split_images_4)
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_image_id          = local.catalog_images_to_import_4[count.index].image_id
@@ -248,6 +262,7 @@ resource "ibm_pi_image" "import_images_4" {
 }
 
 resource "ibm_pi_image" "import_images_5" {
+  provider  =  ibm.ibm-pvs
   count                = length(local.split_images_5)
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
   pi_image_id          = local.catalog_images_to_import_5[count.index].image_id
@@ -260,17 +275,14 @@ resource "ibm_pi_image" "import_images_5" {
 
 
 resource "ibm_pi_key" "linux_sshkey" {
+  provider  =  ibm.ibm-pvs
   pi_key_name          = var.linux_sshkey_name
   pi_ssh_key           = var.linux_ssh_publickey
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 
-data "ibm_pi_network" "ds_network" {
-  pi_network_name = "vtl-subnet"
-  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
-}
-
 resource "ibm_pi_instance" "linux-instance" {
+    provider  =  ibm.ibm-pvs
     pi_memory             = var.linux_memory
     pi_processors         = var.linux_processors
     pi_instance_name      = var.linux_instance_name
@@ -289,12 +301,14 @@ resource "ibm_pi_instance" "linux-instance" {
 }
 
 resource "ibm_pi_key" "AIX_sshkey" {
+  provider  =  ibm.ibm-pvs
   pi_key_name          = var.AIX_sshkey_name
   pi_ssh_key           = var.AIX_ssh_publickey
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 
 resource "ibm_pi_instance" "AIX-instance" {
+    provider  =  ibm.ibm-pvs
     pi_memory             = var.AIX_memory
     pi_processors         = var.AIX_processors
     pi_instance_name      = var.AIX_instance_name
@@ -314,12 +328,14 @@ resource "ibm_pi_instance" "AIX-instance" {
 
 
 resource "ibm_pi_key" "IBMI_sshkey" {
+  provider  =  ibm.ibm-pvs
   pi_key_name          = var.IBMI_sshkey_name
   pi_ssh_key           = var.IBMI_ssh_publickey
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 
 resource "ibm_pi_instance" "IBMI-instance" {
+    provider  =  ibm.ibm-pvs
     pi_memory             = var.IBMI_memory
     pi_processors         = var.IBMI_processors
     pi_instance_name      = var.IBMI_instance_name
@@ -339,22 +355,31 @@ resource "ibm_pi_instance" "IBMI-instance" {
 
 ####################################################
 # Create servers (Windows server in VPC-infrastructure
-#####################################################
-
-
-data "ibm_is_image" "example" {
-  name = "ibm-windows-server-2022-full-standard-amd64-7"
-}
+#################################################
 
 resource "ibm_is_vpc" "example" {
   name = "windows-vpc"
 }
 
+data "ibm_is_image" "example" {
+  name = "ibm-windows-server-2022-full-standard-amd64-7"
+}
+
+resource "ibm_is_vpc_address_prefix" "example" {
+  cidr = "10.0.1.0/24"
+  name = "add-prefix"
+  vpc  = ibm_is_vpc.example.id
+  zone = var.zone
+}
+
 resource "ibm_is_subnet" "example" {
+  depends_on = [
+    ibm_is_vpc_address_prefix.example
+  ]
   name            = "windows-subnet"
   vpc             = ibm_is_vpc.example.id
-  zone            = var.region
-  ipv4_cidr_block = "10.240.0.0/24"
+  zone            = var.zone
+  ipv4_cidr_block = "10.0.1.0/24"
 }
 
 resource "ibm_is_ssh_key" "example" {
@@ -363,15 +388,14 @@ resource "ibm_is_ssh_key" "example" {
 }
 
 resource "ibm_is_instance" "example" {
-  name    = "windows-instance"
+  name    = "${var.prefix}-windows-instance"
   image   = data.ibm_is_image.example.id
   profile = "bx2-2x8"
   metadata_service_enabled  = false
 
   primary_network_interface {
     subnet = ibm_is_subnet.example.id
-    primary_ipv4_address = "10.240.0.6"  // will be deprecated. Use primary_ip.[0].address
-    allow_ip_spoofing = true
+    #allow_ip_spoofing = true
   }
 
   network_interfaces {
@@ -381,7 +405,7 @@ resource "ibm_is_instance" "example" {
   }
 
   vpc  = ibm_is_vpc.example.id
-  zone = var.region
+  zone = var.zone
   keys = [ibm_is_ssh_key.example.id]
 
   //User can configure timeouts

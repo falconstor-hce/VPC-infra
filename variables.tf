@@ -180,6 +180,13 @@ variable "region" {
   default     = "jp-tok"
 }
 
+variable "zone" {
+  description = "zone where VPC will be created. To find your VPC zone, ex:jp-tok-1,us-south-1"
+  type        = string
+  default     = "jp-tok-1"
+}
+
+
 variable "resource_tags" {
   type        = list(string)
   description = "Optional list of tags to be added to created resources"
