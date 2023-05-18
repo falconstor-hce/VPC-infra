@@ -260,15 +260,7 @@ variable "processors" {
   default     = 1
   description = "The number of vCPUs, AKA virtual processors, to assign to the VTL virtual machine instance; one vCPU is equal to one physical CPU core."
 }
-variable "powervs_instance_name" {
-  description = "Name of instance which will be created"
-  type        = string
-  default     = "vtl-vpe"
-  validation {
-    condition     = length(var.powervs_instance_name) <= 13
-    error_message = "Maximum length of Instance name must be less or equal to 13 characters only."
-  }
-}
+
 variable "processor_type" {
   type        = string
   default     = "shared"
@@ -297,7 +289,7 @@ variable "powervs_storage_config" {
   default = {
     names      = "configuration-volume,index_volume,tape_volume"
     disks_size = "20,1024,1024"
-    counts     = "1,1,1"
+    counts     = "3"
     tiers      = "tier1,tier1,tier1"
     #paths      = ""
   }
@@ -332,11 +324,6 @@ variable "powervs_os_image_name2" {
   default     = "IBMi-72-09-2924-8"
 }
 
-variable "IBMI_sshkey_name" {
-  type        = string
-  default     = "FS_IBMI_sshkey"
-  description = "IBMI_sshkey_name"
-}
 
 variable "IBMI_memory" {
   type        = number
@@ -350,11 +337,6 @@ variable "IBMI_processors" {
   description = "IBMI_processors"
 }
 
-variable "IBMI_instance_name" {
-  type        = string
-  default     = "FS_DraaS_IBMI_instance"
-  description = "IBMI_instance_name"
-}
 
 variable "IBMI_proc_type" {
   type        = string
@@ -374,16 +356,6 @@ variable "IBMI_storage_type" {
   description = "Type of storage tier to assign to the VTL instance based on required performance: 'tier1' or 'tier3'"
 }
 
-
-
-variable "AIX_sshkey_name" {
-  type        = string
-  default     = "fs_AIX_sshkey"
-  description = "AIX_sshkey_name"
-}
-
-
-
 variable "AIX_memory" {
   type        = number
   default     = "2"
@@ -394,12 +366,6 @@ variable "AIX_processors" {
   type        = number
   default     = "0.25"
   description = "AIX_processors"
-}
-
-variable "AIX_instance_name" {
-  type        = string
-  default     = "fs_DraaS_AIX_instance"
-  description = "AIX_instance_name"
 }
 
 variable "AIX_proc_type" {
@@ -420,14 +386,6 @@ variable "AIX_storage_type" {
   description = "Type of storage tier to assign to the VTL instance based on required performance: 'tier1' or 'tier3'"
 }
 
-variable "linux_sshkey_name" {
-  type        = string
-  default     = "fs_linux_sshkey"
-  description = "linux_sshkey_name"
-}
-
-
-
 variable "linux_memory" {
   type        = number
   default     = "2"
@@ -438,12 +396,6 @@ variable "linux_processors" {
   type        = number
   default     = "0.25"
   description = "linux_processors"
-}
-
-variable "linux_instance_name" {
-  type        = string
-  default     = "fs_DraaS_linux_instance"
-  description = "linux_instance_name"
 }
 
 variable "linux_proc_type" {
