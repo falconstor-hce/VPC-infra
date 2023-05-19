@@ -248,21 +248,81 @@ data "ibm_pi_instance" "instance_ips_ds" {
 #####################################################
 # Create servers (Linux,IBMI,AIX) in power-workspace
 #####################################################
+data "ibm_pi_catalog_images" "catalog_images_ds" {
+  sap                  = true
+  provider  =  ibm.ibm-pvs
+  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
+}
+
+locals {
+
+  split_images_list = chunklist(var.powervs_image_names, 2)
+  images_count      = length(local.split_images_list)
+
+  split_images_3 = (local.images_count > 0 ? toset(element(local.split_images_list, local.images_count - length(local.split_images_list))) : [])
+  split_images_4 = (length(local.split_images_3) > 0 && (local.images_count - 1) > 0 ? toset(element(local.split_images_list, (local.images_count - length(local.split_images_list)) + 1)) : [])
+  split_images_5 = (length(local.split_images_4) > 0 && (local.images_count - 2) > 0 ? toset(element(local.split_images_list, (local.images_count - length(local.split_images_list)) + 2)) : [])
+
+  catalog_images_to_import_3 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in local.split_images_3 : stock_image if stock_image.name == image_name]])
+  catalog_images_to_import_4 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in local.split_images_4 : stock_image if stock_image.name == image_name]])
+  catalog_images_to_import_5 = flatten([for stock_image in data.ibm_pi_catalog_images.catalog_images_ds.images : [for image_name in local.split_images_5 : stock_image if stock_image.name == image_name]])
+
+}
+
+resource "ibm_pi_image" "import_images_3" {
+   provider  =  ibm.ibm-pvs
+  for_each             = toset(local.split_images_3)
+  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
+  pi_image_id          = local.catalog_images_to_import_3[index(tolist(local.split_images_3), each.key)].image_id
+  pi_image_name        = each.key
+
+  timeouts {
+    create = "9m"
+  }
+}
+
+resource "ibm_pi_image" "import_images_4" {
+  depends_on           = [ibm_pi_image.import_images_3]
+   provider  =  ibm.ibm-pvs
+  for_each             = toset(local.split_images_4)
+  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
+  pi_image_id          = local.catalog_images_to_import_4[index(tolist(local.split_images_4), each.key)].image_id
+  pi_image_name        = each.key
+
+  timeouts {
+    create = "9m"
+  }
+}
+
+resource "ibm_pi_image" "import_images_5" {
+  depends_on           = [ibm_pi_image.import_images_4]
+   provider  =  ibm.ibm-pvs
+  for_each             = toset(local.split_images_5)
+  pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
+  pi_image_id          = local.catalog_images_to_import_5[index(tolist(local.split_images_5), each.key)].image_id
+  pi_image_name        = each.key
+
+  timeouts {
+    create = "9m"
+  }
+
+}
+
 
 data "ibm_pi_image" "image1" {
-  depends_on = [ module.powervs_infra ]
+  depends_on = [ ibm_pi_image.import_images_3 ]
   provider  =  ibm.ibm-pvs
   pi_image_name        = var.powervs_os_image_name1
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 data "ibm_pi_image" "image2" {
-  depends_on = [ module.powervs_infra ]
+  depends_on = [ ibm_pi_image.import_images_4 ]
  provider  =  ibm.ibm-pvs
   pi_image_name        = var.powervs_os_image_name2
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
 }
 data "ibm_pi_image" "image3" {
-  depends_on = [ module.powervs_infra ]
+  depends_on = [ ibm_pi_image.import_images_5]
   provider  =  ibm.ibm-pvs
   pi_image_name        = var.powervs_os_image_name3
   pi_cloud_instance_id = data.ibm_resource_instance.powervs_workspace_ds.guid
@@ -293,6 +353,10 @@ resource "ibm_pi_instance" "linux-instance" {
     pi_network {
       network_id = data.ibm_pi_network.network_1.id
     }
+timeouts {
+    create = "1h"
+  }
+
 }
 
 resource "ibm_pi_key" "AIX_sshkey" {
@@ -318,6 +382,10 @@ resource "ibm_pi_instance" "AIX-instance" {
     pi_network {
       network_id = data.ibm_pi_network.network_1.id
     }
+timeouts {
+    create = "1h"
+  }
+
 }
 
 
@@ -344,6 +412,10 @@ resource "ibm_pi_instance" "IBMI-instance" {
     pi_network {
       network_id = data.ibm_pi_network.network_1.id
     }
+timeouts {
+    create = "1h"
+  }
+
 }
 
 ####################################################
