@@ -1,5 +1,5 @@
 ##############################################################################
-# Outputs
+#outputs
 ##############################################################################
 
 output "landing_zone" {
@@ -80,11 +80,4 @@ output "instance_wwns" {
   description = "Unique volume IDs (wwns) of all volumes attached to IBM PowerVS instance."
   depends_on  = [ibm_pi_volume.create_volume]
   value       = ibm_pi_volume.create_volume[*].wwn
-}
-
-// primary_ipv4_address deprecation 
-output "primary_ipv4_address" {
-  description ="primary_ipv4_address of windows server"
-  # value = ibm_is_instance.example.primary_network_interface.0.primary_ipv4_address // will be deprecated in future
-  value = ibm_is_instance.example.primary_network_interface.0.primary_ip.0.address // use this instead 
 }
