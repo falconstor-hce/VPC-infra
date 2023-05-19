@@ -6,13 +6,13 @@ variable "ibmcloud_api_key" {
   description = "The IBM Cloud platform API key needed to deploy IAM enabled resources."
   type        = string
   sensitive   = true
-  default     = "5Frgf9C72JYeD0NlnP2Flo1qJu8v3BvQ2WdeaGDyzI1v"
+  default     = ""
 }
 
 variable "prefix" {
   description = "A unique identifier for resources. Must begin with a lowercase letter and end with a lowerccase letter or number. This prefix will be prepended to any resources provisioned by this template. Prefixes must be 16 or fewer characters."
   type        = string
-  default     = "fs-draas"
+  default     = ""
 
   validation {
     error_message = "Prefix must begin with a lowercase letter and contain only lowercase letters, numbers, and - characters. Prefixes must end with a lowercase letter or number and be 16 or fewer characters."
@@ -23,150 +23,7 @@ variable "prefix" {
 variable "preset" {
   description = "Use one of supported [configurations](https://github.com/terraform-ibm-modules/terraform-ibm-powervs-infrastructure/tree/main/examples/ibm-catalog/presets/slz-for-powervs). Copy the configuration from the link into the `preset` deployment value."
   type        = string
-  default     = <<EOF
-   {
-    "enable_transit_gateway": true,
-    "transit_gateway_connections": [
-      "management"
-    ],
-    "transit_gateway_resource_group": "slz-service-rg",
-    "service_endpoints": "private",
-    "security_groups": [],
-    "atracker": {
-      "collector_bucket_name": "",
-      "receive_global_events": true,
-      "resource_group": "",
-      "add_route": false
-    },
-    "cos": [
-      {
-        "buckets": [
-          {
-            "endpoint_type": "public",
-            "force_delete": true,
-            "name": "falconstor-bucket",
-            "storage_class": "standard",
-            "kms_key": "slz-cos-key"
-          }
-        ],
-        "keys": [
-          {
-              "name": "falconstor-cos",
-              "role": "Object Writer",
-              "enable_HMAC": true
-          }
-        ],
-        "name": "falconstor-cos",
-        "plan": "standard",
-        "random_suffix": true,
-        "resource_group": "slz-service-rg",
-        "use_data": false
-      }
-    ],
-    "iam_account_settings": {
-      "enable": false
-    },
-    "key_management": {
-      "keys": [
-        {
-          "key_ring": "slz-slz-ring",
-          "name": "slz-cos-key",
-          "root_key": true
-        }
-      ],
-      "name": "slz-kms",
-      "resource_group": "slz-service-rg",
-      "use_hs_crypto": false
-    },
-    "resource_groups": [
-      {
-        "create": true,
-        "name": "slz-service-rg",
-        "use_prefix": true
-      },
-      {
-        "create": true,
-        "name": "slz-management-rg",
-        "use_prefix": true
-      }
-    ],
-    "secrets_manager": {
-      "kms_key_name": null,
-      "name": null,
-      "resource_group": null,
-      "use_secrets_manager": false
-    },
-    "network_cidr": "10.0.0.0/8",
-    "vpcs": [
-      {
-        "address_prefixes": {
-          "zone-1": [],
-          "zone-2": [],
-          "zone-3": []
-        },
-        "default_security_group_rules": [],
-        "flow_logs_bucket_name": null,
-        "network_acls": [
-          {
-            "name": "management-acl",
-            "rules": [
-              {
-                "action": "allow",
-                "destination": "0.0.0.0/0",
-                "direction": "inbound",
-                "name": "allow-all-inbound",
-                "source": "0.0.0.0/0"
-              },
-              {
-                "action": "allow",
-                "destination": "0.0.0.0/0",
-                "direction": "outbound",
-                "name": "allow-all-outbound",
-                "source": "0.0.0.0/0"
-              }
-            ]
-          }
-        ],
-        "prefix": "management",
-        "resource_group": "slz-management-rg",
-        "subnets": {
-          "zone-1": [
-            {
-              "acl_name": "management-acl",
-              "cidr": "10.10.10.0/24",
-              "name": "zone-1",
-              "public_gateway": false
-            }
-          ],
-          "zone-2": null,
-          "zone-3": null
-        },
-        "use_public_gateways": {
-          "zone-1": false,
-          "zone-2": false,
-          "zone-3": false
-        }
-      }
-    ],
-    "vsi": [],
-    "vpn_gateways": [],
-    "virtual_private_endpoints": [
-      {
-          "service_name": "falconstor-cos",
-          "service_type": "cloud-object-storage",
-          "resource_group": "slz-service-rg",
-          "vpcs": [
-              {
-                  "name": "management",
-                  "subnets": [
-                      "zone-1"
-                  ]
-              }
-          ]
-      }
-  ]
-}
-EOF
+  default     = ""
 
   validation {
     condition     = (var.preset != null && var.preset != "")
@@ -177,13 +34,13 @@ EOF
 variable "region" {
   description = "Region where VPC will be created. To find your VPC region, use `ibmcloud is regions` command to find available regions."
   type        = string
-  default     = "jp-tok"
+  default     = ""
 }
 
 variable "zone" {
   description = "zone where VPC will be created. To find your VPC zone, ex:jp-tok-1,us-south-1"
   type        = string
-  default     = "jp-tok-1"
+  default     = ""
 }
 
 
@@ -196,7 +53,7 @@ variable "resource_tags" {
 variable "powervs_zone" {
   description = "IBM Cloud data center location where IBM PowerVS infrastructure will be created."
   type        = string
-  default     = "tok04"
+  default     = ""
 }
 
 variable "powervs_resource_group_name" {
@@ -211,37 +68,37 @@ variable "powervs_resource_group_name" {
 variable "ssh_public_key" {
   description = "Public SSH Key for VSI creation. Must be an RSA key with a key size of either 2048 bits or 4096 bits (recommended). Must be a valid SSH key that does not already exist in the deployment region."
   type        = string
-  default     ="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCNOUy7yc2SK9A5GBoiq47TPRcv1PkwOzTwE4h85MzZZIZ54Q5g3T/qFd3njz41ifHBKuXX+UxZftUo4oZkpvFNGUqxEvapXaB4MbfetXcteWvl7gMjFr/ZSEYB4rRNicIFco+f2/ko5Imu8Gsp0K7sUbr6jTTeUSjHaQM6m8UlavO/8ffG+dMUkiGEBjXAn9yYeudE4CuxQ9+P1bJaNL/NcWxiGfpmYy/hkQNj/ZTacqJlym8rzxK+Y4TfrPEgSCHSMprUpShOD2ba3FMqXH7VjxRD2ypj7VKVsHKHeZrMKhIyZX0U4oaH0uWbLF/dNZ3HeUQTkfCkFi9VLeC+hX0T rsa-key-20230519"
+  default     =""
 }
 
 variable "ssh_private_key" {
   description = "Private SSH key (RSA format) used to login to IBM PowerVS instances. Should match to public SSH key referenced by 'ssh_public_key'. Entered data must be in [heredoc strings format](https://www.terraform.io/language/expressions/strings#heredoc-strings). The key is not uploaded or stored. For more information about SSH keys, see [SSH keys](https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys)."
   type        = string
   sensitive   = true
-  default     ="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCNOUy7yc2SK9A5GBoiq47TPRcv1PkwOzTwE4h85MzZZIZ54Q5g3T/qFd3njz41ifHBKuXX+UxZftUo4oZkpvFNGUqxEvapXaB4MbfetXcteWvl7gMjFr/ZSEYB4rRNicIFco+f2/ko5Imu8Gsp0K7sUbr6jTTeUSjHaQM6m8UlavO/8ffG+dMUkiGEBjXAn9yYeudE4CuxQ9+P1bJaNL/NcWxiGfpmYy/hkQNj/ZTacqJlym8rzxK+Y4TfrPEgSCHSMprUpShOD2ba3FMqXH7VjxRD2ypj7VKVsHKHeZrMKhIyZX0U4oaH0uWbLF/dNZ3HeUQTkfCkFi9VLeC+hX0T rsa-key-20230519"
+  default     =""
 }
 
 variable "IBMI_ssh_publickey" {
   type        = string
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXO+Or21SmybJYgZfv6+N4QvwEFw3Lc971G1vpFtOh5Y4Tfaym7K7jEuyuqJTP1xzqfVWC3QEHgGPj3X6jaJ02+rDxSHbYpl78UVwSlFwAerZKQ0U/Ju28RsZMqvxKGv9yrCX0kkapFbOf0jZR/Cf33KSK8f3Rzod7knM9nvXujbjNlixN12KBlFvk2H6m+KKZOeeZz5boAOVMYZhWEcYn8ktv0iYl/57lj4QUEDq4LPDyBToq8SxfAD2PV8hfVvD4dZCdKH6R+SNI5kSBCN67ck/pWKFn4TrlCkz3sUZlDpdxfyCUOfNUItXfxW+tfIo+Ax5SNxt3c6vXTwjskAjT rsa-key-20230519"
+  default     = ""
   description = "IBMI_ssh_publickey"
 }
 
 variable "AIX_ssh_publickey" {
   type        = string
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCMejnM4lNDhcOtQPKfn7SlhaeK6+cTpJgsMF0d8RY6xwnkuIXnpyEX76A2w3CE0XEMc0IzcSpQWgAwV70nAXYjWUC1U2hedQzVzplJN6Yakyfi81O/TjCRnd1DrTfxVkUWsJPy4JcRKkWFBRAvW4W6zaNi6R+8HUObfplSls9HTfyK+p5+UGPusFN4VJe9zers4pcQc4rPH2dHuZ4LiWZntFheCDPPrEuJB0t6k9i2rw29EG1lPua7oM0SWO1md0U7zLZzwDtvn/LWuPuOfcefVSTWoQEfQnS8BAgp7MUA43WhgZSVhakuSP2UbgNDl1Pv47Q/C8KXZrobeMYPkl6D rsa-key-20230519"
+  default     = ""
   description = "AIX_ssh_publickey"
 }
 
 variable "linux_ssh_publickey" {
   type        = string
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYzPKhAEjr6jIO97DSRDHCc1dPPfBXFx3mst01MU61L3R68/z3/XHTiRnrSqFddLzJ8xNmA1oTdmYEiuq68M3ycNOhwPry+t9yScYBgLBP7i/DAn6vfDig8ozxA/XpEbkTvVg7y2F2euB1N154hVmwOB5yTAWmf+gEoUq80emwi+vNOoMEoPmDy9auIjYHRb2wqPt7ZJTbBI4QXlP10oXAz/jdvyMGwrZZalvyFLDJfvSkg3PfTKtOiC35L+rYMt75RTXRvZoZLpl9AWDa+x/CMpshtlsfdFRuFY+mp06f1YBNCw/wZddoPxlpf3lWhRfw8KXOcQMJnWJ6E0uA2INh rsa-key-20230519"
+  default     = ""
   description = "linux_ssh_publickey"
 }
 
 variable "windows_ssh_publickey" {
   type        = string
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCd7/BNidtNn38eSUPoGKm0JgKoWuf+Hxems377a3miEnM8tw46z42wadpOVtv1QZACGs1EsNOi09c1xqYv6jn4MkO86x0GZYbCe6Lbkz/h9tHkAr7nUV+0Rdi3c81iGYORcTD7mq9C752Lt1/ZUxZJxZs+HoJAYUyxmeKtSzREQd/ePLXpqJN5h4/2HB50jn13K06rUgDNCyL53xipV/LdPZjBZcaTDxknOXWwlWkldifSGBD3faRzTS1fWFI1dGBy5mxOp8FQxtiroeHbs0lDjn3IG0x4qGgB2Yp4sT3Pqrmio4F6Poc0sGXsVi1wVGh6s2Hjkx4pU8Htsqw9fYad rsa-key-20230519"
+  default     = ""
   description = "windows_ssh_publickey"
 }
 
